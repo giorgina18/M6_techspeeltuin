@@ -1,8 +1,10 @@
-/*ARDUINO JOYSTICK CONTROLLED CAR (RECEIVER)
-        
-YOU HAVE TO INSTALL THE RF24 LIBRARY BEFORE UPLOADING THE CODE
-   https://github.com/tmrh20/RF24/        
-*/
+// dit is de code van youtube tutorial
+
+///*ARDUINO JOYSTICK CONTROLLED CAR (RECEIVER)
+//        
+//YOU HAVE TO INSTALL THE RF24 LIBRARY BEFORE UPLOADING THE CODE
+//   https://github.com/tmrh20/RF24/        
+//*/
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -27,6 +29,12 @@ void setup() {
   pinMode(in4, OUTPUT);
   Serial.begin(9600);
   radio.begin();
+  
+  if (!radio.isChipConnected()) {
+  Serial.println("NRF24L01 not connected or faulty!");
+  }else{
+    Serial.println("NRF24L01 connected!");
+  }
   radio.openReadingPipe(0, address);
   radio.setPALevel(RF24_PA_MIN);
   radio.startListening();
@@ -108,3 +116,118 @@ void loop() {
   analogWrite(enA, motorSpeedA); // Send PWM signal to motor A
   analogWrite(enB, motorSpeedB); // Send PWM signal to motor B
 }
+
+
+// dit is verbeter code van chat gpt 
+
+//#include <SPI.h>
+//#include <nRF24L01.h>
+//#include <RF24.h>
+//
+//// Pinout motor driver
+//#define enA 2  
+//#define in1 3
+//#define in2 4
+//#define enB 7   
+//#define in3 5
+//#define in4 6
+//
+//// NRF24L01 Pinout
+//RF24 radio(8, 9); // CE, CSN
+//
+//// Adres van de communicatie
+//const byte address[6] = "00001";
+//
+//// Structuur om joystick data te ontvangen
+//struct DataPackage {
+//  int xAxis;
+//  int yAxis;
+//};
+//
+//DataPackage data; // Structuurinstantie
+//
+//void setup() {
+//  // Motor driver pinnen instellen
+//  pinMode(enA, OUTPUT);
+//  pinMode(enB, OUTPUT);
+//  pinMode(in1, OUTPUT);
+//  pinMode(in2, OUTPUT);
+//  pinMode(in3, OUTPUT);
+//  pinMode(in4, OUTPUT);
+//
+//  // Serial monitor voor debuggen
+//  Serial.begin(9600);
+//  delay(2000);
+//
+//  // NRF24L01 instellen
+//  radio.begin();
+//  if (!radio.isChipConnected()) {
+//    Serial.println("NRF24L01 not connected or faulty!");
+//  }else{
+//    Serial.println("NRF24L01 connected!");
+//  }
+//  
+//  radio.printDetails();
+//  radio.openReadingPipe(0, address); // Open ontvangeradres
+//  radio.setPALevel(RF24_PA_LOW);     // Vermogen instellen
+//  radio.startListening();            // Ontvangmodus starten
+//}
+//
+//void loop() {
+//  // Controleer of er data beschikbaar is
+//  if (radio.available()) {
+//    // Gegevens ontvangen
+//    radio.read(&data, sizeof(data));
+//    Serial.print("Ontvangen X: ");
+//    Serial.print(data.xAxis);
+//    Serial.print(" | Y: ");
+//    Serial.println(data.yAxis);
+//
+//    // **Beweging op basis van Y-as (vooruit/achteruit)**
+//    int motorSpeedA = 0;
+//    int motorSpeedB = 0;
+//
+//    if (data.yAxis < 470) {
+//      // Achteruit
+//      digitalWrite(in1, HIGH);
+//      digitalWrite(in2, LOW);
+//      digitalWrite(in3, HIGH);
+//      digitalWrite(in4, LOW);
+//      motorSpeedA = map(data.yAxis, 470, 0, 0, 255);
+//      motorSpeedB = map(data.yAxis, 470, 0, 0, 255);
+//    } else if (data.yAxis > 550) {
+//      // Vooruit
+//      digitalWrite(in1, LOW);
+//      digitalWrite(in2, HIGH);
+//      digitalWrite(in3, LOW);
+//      digitalWrite(in4, HIGH);
+//      motorSpeedA = map(data.yAxis, 550, 1023, 0, 255);
+//      motorSpeedB = map(data.yAxis, 550, 1023, 0, 255);
+//    } else {
+//      // Stop motors
+//      motorSpeedA = 0;
+//      motorSpeedB = 0;
+//    }
+//
+//    // **Beweging op basis van X-as (links/rechts)**
+//    if (data.xAxis < 470) {
+//      // Naar links
+//      int xMapped = map(data.xAxis, 470, 0, 0, 255);
+//      motorSpeedA = motorSpeedA + xMapped;
+//      motorSpeedB = motorSpeedB - xMapped;
+//    } else if (data.xAxis > 550) {
+//      // Naar rechts
+//      int xMapped = map(data.xAxis, 550, 1023, 0, 255);
+//      motorSpeedA = motorSpeedA - xMapped;
+//      motorSpeedB = motorSpeedB + xMapped;
+//    }
+//
+//    // Motor PWM grenzen instellen
+//    motorSpeedA = constrain(motorSpeedA, 0, 255);
+//    motorSpeedB = constrain(motorSpeedB, 0, 255);
+//
+//    // PWM-signalen naar motor sturen
+//    analogWrite(enA, motorSpeedA);
+//    analogWrite(enB, motorSpeedB);
+//  }
+//}
